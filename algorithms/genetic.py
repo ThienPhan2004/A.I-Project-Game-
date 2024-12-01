@@ -4,6 +4,7 @@ from collections import deque
 
 class GeneticSnake:
     def __init__(self, population_size=50):
+        # Khởi tạo kích thước quần thể
         self.population_size = population_size
         self.num_weights = 24
         self.population = self.initialize_population()
@@ -14,6 +15,7 @@ class GeneticSnake:
         self.previous_positions = deque(maxlen=20)
         
     def initialize_population(self):
+         # Khởi tạo quần thể với các trọng số ngẫu nhiên
         return [np.random.uniform(-1, 1, (6, 4)) for _ in range(self.population_size)]
     
     def calculate_inputs(self, snake, food, grid_width, grid_height):

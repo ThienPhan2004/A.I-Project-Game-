@@ -16,14 +16,15 @@ from algorithms.backtracking import backtracking_next_move
 
 class Game:
     def __init__(self):
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-        pygame.display.set_caption("Snake Xenzia")
+        # Khởi tạo các thuộc tính của trò chơi
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) # Tạo cửa sổ trò chơi
+        pygame.display.set_caption("Snake Xenzia") # Đặt tiêu đề cho cửa sổ
 
-        # Load sounds
-        self.menu_music = pygame.mixer.Sound(os.path.join(SOUND_DIR, "menu_music.mp3"))
-        self.game_music = pygame.mixer.Sound(os.path.join(SOUND_DIR, "game_music.mp3"))
-        self.eat_sound = pygame.mixer.Sound(os.path.join(SOUND_DIR, "eat.wav"))
-        self.death_sound = pygame.mixer.Sound(os.path.join(SOUND_DIR, "death.wav"))
+        # Tải âm thanh
+        self.menu_music = pygame.mixer.Sound(os.path.join(SOUND_DIR, "menu_music.mp3")) # Nhạc menu
+        self.game_music = pygame.mixer.Sound(os.path.join(SOUND_DIR, "game_music.mp3")) # Nhạc trò chơi
+        self.eat_sound = pygame.mixer.Sound(os.path.join(SOUND_DIR, "eat.wav")) # Âm thanh khi ăn
+        self.death_sound = pygame.mixer.Sound(os.path.join(SOUND_DIR, "death.wav")) # Âm thanh khi chết
 
         # Load font
         # self.font = pygame.font.Font(os.path.join(FONT_DIR, "game_font.ttf"), 36)
@@ -31,21 +32,21 @@ class Game:
         self.font = pygame.font.SysFont(None, 36)
         self.small_font = pygame.font.SysFont(None, 24)
         
-        self.high_scores = HighScores()
-        self.clock = pygame.time.Clock()
-        self.small_food_count = 0  # Thm biến đếm đồ ăn nhỏ
+        self.high_scores = HighScores() # Khởi tạo bảng điểm cao
+        self.clock = pygame.time.Clock() # Tạo đồng hồ để kiểm soát tốc độ khung hình
+        self.small_food_count = 0  # Biến đếm đồ ăn nhỏ
         self.genetic_snake = GeneticSnake()  # Thêm đối tượng GA
         self.generation_scores = []  # Lưu điểm số của thế hệ hiện tại
         self.reset_game()
-        self.glow_timer = 0  # Thêm biến đếm thời gian cho hiệu ứng
+        self.glow_timer = 0  # Thêm biến đếm thời gian cho hiệu ứng sáng
         
-        # Load background image
+        # Tải hình nền
         try:
-            self.background_img = pygame.image.load(os.path.join(IMG_DIR, "background.png"))
-            self.background_img = pygame.transform.scale(self.background_img, (WINDOW_WIDTH, WINDOW_HEIGHT))
+            self.background_img = pygame.image.load(os.path.join(IMG_DIR, "background.png")) # Tải hình nền
+            self.background_img = pygame.transform.scale(self.background_img, (WINDOW_WIDTH, WINDOW_HEIGHT))  # Thay đổi kích thước hình nền
         except:
             print("Warning: Could not load background image")
-            self.background_img = None
+            self.background_img = None # Hiện lỗi khi không tải được ảnh, lúc này set None
         
         self.algorithm_stats = {
             'BFS': {'scores': [], 'times': []},
@@ -53,44 +54,45 @@ class Game:
             'Genetic': {'scores': [], 'times': []},
             'Backtracking': {'scores': [], 'times': []}
         }
-        self.performance_graph = None
+        # self.performance_graph = None
         
-        self.performance_data = {
-            'BFS': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []},
-            'A*': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []},
-            'Genetic': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []},
-            'Backtracking': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []}
-        }
+        # self.performance_data = {
+        #     'BFS': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []},
+        #     'A*': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []},
+        #    'Genetic': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []},
+        #    'Backtracking': {'snake': None, 'food': None, 'score': 0, 'time': 0, 'moves': [], 'path': []}
+        #}
         self.is_comparing = False
         self.comparison_start_time = 0
         self.pause_start_time = 0  # Thêm biến lưu thời điểm bắt đầu pause
         self.total_pause_time = 0  # Thêm biến lưu tổng thời gian đã pause
         
     def reset_game(self):
-        self.state = GameState.MAIN_MENU
-        self.mode = GameMode.MANUAL
-        self.snake = Snake()
-        self.food = Food(self.snake)
-        self.score = 0
-        self.game_time = 0
-        self.start_time = 0
-        self.game_speed = 10
-        self.menu_music.play(-1) # Phát nhạc (-1 nghĩa là lặp vô hạn)
-        self.small_food_count = 0  # Reset biến đếm
+        # Đặt lại trạng thái trò chơi
+        self.state = GameState.MAIN_MENU  # Trạng thái chính
+        self.mode = GameMode.MANUAL  # Chế độ chơi mặc định
+        self.snake = Snake()  # Khởi tạo đối tượng rắn
+        self.food = Food(self.snake)  # Khởi tạo đối tượng thức ăn
+        self.score = 0  # Điểm số
+        self.game_time = 0  # Thời gian chơi
+        self.start_time = 0  # Thời gian bắt đầu
+        self.game_speed = 10  # Tốc độ trò chơi
+        self.menu_music.play(-1)  # Phát nhạc menu (-1 nghĩa là lặp vô hạn)
+        self.small_food_count = 0  # Đặt lại biến đếm
         if self.mode == GameMode.GENETIC:
-            self.generation_scores.append(self.score)
+            self.generation_scores.append(self.score)  # Lưu điểm số vào thế hệ
             if len(self.generation_scores) >= 10:  # Sau 10 lần chơi
-                self.genetic_snake.evolve(self.generation_scores)
-                self.generation_scores = []
-        self.pause_start_time = 0
-        self.total_pause_time = 0
+                self.genetic_snake.evolve(self.generation_scores)  # Tiến hóa rắn di truyền
+                self.generation_scores = []  # Đặt lại điểm số thế hệ
+        self.pause_start_time = 0  # Đặt lại thời gian bắt đầu tạm dừng
+        self.total_pause_time = 0  # Đặt lại tổng thời gian đã tạm dừng
         
     def draw_button(self, text, pos, selected=False, is_hovered=False):
         # Tính toán kích thước nút dựa trên độ dài của text
         text_surface = self.font.render(text, True, BLACK)
         text_width = text_surface.get_width()
         button_width = max(200, text_width + 40)
-        button_height = 50
+        button_height = 50  # Chiều cao nút
         border_radius = 25  # Độ bo tròn của góc
 
         # Hiệu ứng hover animation
@@ -138,6 +140,7 @@ class Game:
         return button_rect
         
     def show_rules(self):
+         # Hiển thị quy tắc trò chơi
         if self.background_img:
             self.screen.blit(self.background_img, (0, 0))
         else:
